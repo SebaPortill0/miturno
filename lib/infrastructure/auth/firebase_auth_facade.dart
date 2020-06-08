@@ -1,18 +1,25 @@
 import 'package:App/domain/auth/auth_failure.dart';
 import 'package:App/domain/auth/i_auth_facade.dart';
+import 'package:App/domain/auth/user.dart';
+import 'package:App/domain/core/value_objects.dart';
 import 'package:dartz/dartz.dart';
 import 'package:App/domain/auth/value_objects.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:injectable/injectable.dart';
+import './firebase_user_mapper.dart';
 
-@lazySingleton
+// @lazySingleton ?? Gives an error
 @Injectable(as: IAuthFacade)
 class FirebaseAuthFacade implements IAuthFacade {
   final FirebaseAuth _firebaseAuth;
 
   FirebaseAuthFacade(this._firebaseAuth);
+
+  @override 
+  Future<Option<User>> getSignedInUser() => _firebaseAuth.currentUser().
+    then((firebaseUser) => optionOf(firebaseUser?.toDomain()));
 
   @override
   Future<Either<AuthFailure, Unit>> registerWithEmailAndPassword({
@@ -51,4 +58,9 @@ class FirebaseAuthFacade implements IAuthFacade {
         }
       }
   }
+
+  @override 
+  Future<void> signOut() => Future.wait([
+    _firebaseAuth.signOut(),
+  ]);
 }
