@@ -7,13 +7,9 @@ import 'package:App/application/auth/sign_in_form/sign_in_form_bloc.dart';
 class SignInPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      resizeToAvoidBottomPadding: false,
-      resizeToAvoidBottomInset: false,
-      body: BlocProvider(
+    return BlocProvider(
         create: (context) => getIt<SignInFormBloc>(),
         child: SignInForm(),
-      ),
     );
   }
 }

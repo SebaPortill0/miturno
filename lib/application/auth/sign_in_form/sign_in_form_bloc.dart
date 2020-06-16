@@ -41,44 +41,52 @@ class SignInFormBloc extends Bloc<SignInFormEvent, SignInFormState> {
         );
       }, 
       signInWithEmailAndPasswordPressed: (e) async* {
-      yield* _performActionOnAuthFacadeWithEmailAndPassword(
-        _authFacade.signInWithEmailAndPassword,
-      );
-      },
-      registerWithEmailAndPasswordPressed: (e) async* {
-        yield* _performActionOnAuthFacadeWithEmailAndPassword(
-          _authFacade.registerWithEmailAndPassword,
+      Either<AuthFailure, Unit> failureOrSuccess;
+
+      final isEmailValid = state.emailAddress.isValid();
+      final isPasswordValid = state.password.isValid();
+
+      if (isEmailValid && isPasswordValid) {
+        yield  state.copyWith(
+          isLoginSubmitting: true,
+          authFailureOrSuccessOption: none(),
         );
+        failureOrSuccess = await _authFacade.signInWithEmailAndPassword(
+          emailAddress: state.emailAddress,
+          password: state.password,
+        );
+      }
+        
+      yield state.copyWith(
+        isLoginSubmitting: false,
+        showErrorMessages: true,
+        authFailureOrSuccessOption: optionOf(failureOrSuccess),
+      );
+    },
+      registerWithEmailAndPasswordPressed: (e) async* {
+        Either<AuthFailure, Unit> failureOrSuccess;
+
+      final isEmailValid = state.emailAddress.isValid();
+      final isPasswordValid = state.password.isValid();
+
+      if (isEmailValid && isPasswordValid) {
+        yield  state.copyWith(
+          isRegisterSubmitting: true,
+          authFailureOrSuccessOption: none(),
+        );
+        failureOrSuccess = await _authFacade.registerWithEmailAndPassword(
+          emailAddress: state.emailAddress,
+          password: state.password,
+        );
+      }
+        
+      yield state.copyWith(
+        isRegisterSubmitting: false,
+        showErrorMessages: true,
+        authFailureOrSuccessOption: optionOf(failureOrSuccess),
+      );
       }
     );
   }
-
-  Stream<SignInFormState> _performActionOnAuthFacadeWithEmailAndPassword(
-    Future<Either<AuthFailure, Unit>> Function({
-      @required EmailAddress emailAddress,
-      @required Password password,
-    }) forwardedCall,
-  ) async* {
-    Either<AuthFailure, Unit> failureOrSuccess;
-
-    final isEmailValid = state.emailAddress.isValid();
-    final isPasswordValid = state.password.isValid();
-
-    if (isEmailValid && isPasswordValid) {
-      yield  state.copyWith(
-        isSubmitting: true,
-        authFailureOrSuccessOption: none(),
-      );
-      final failureOrSuccess = await forwardedCall(
-        emailAddress: state.emailAddress,
-        password: state.password,
-      );
-    }
-        
-    yield state.copyWith(
-      isSubmitting: false,
-      showErrorMessages: true,
-      authFailureOrSuccessOption: optionOf(failureOrSuccess),
-    );
-  }
+  
 }

@@ -9,6 +9,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:App/infrastructure/auth/firebase_auth_facade.dart';
 import 'package:App/domain/auth/i_auth_facade.dart';
+import 'package:App/infrastructure/clients/client_repository.dart';
+import 'package:App/domain/clients/i_client_respository.dart';
+import 'package:App/infrastructure/users/user_repository.dart';
+import 'package:App/domain/user_data/i_user_repository.dart';
 import 'package:App/application/auth/sign_in_form/sign_in_form_bloc.dart';
 import 'package:App/application/auth/auth_bloc.dart';
 import 'package:get_it/get_it.dart';
@@ -18,9 +22,22 @@ void $initGetIt(GetIt g, {String environment}) {
   g.registerLazySingleton<FirebaseAuth>(
       () => firebaseInjectableModule.firebaseAuth);
   g.registerLazySingleton<Firestore>(() => firebaseInjectableModule.firestore);
-  g.registerFactory<IAuthFacade>(() => FirebaseAuthFacade(g<FirebaseAuth>()));
+  g.registerLazySingleton<IAuthFacade>(
+      () => FirebaseAuthFacade(g<FirebaseAuth>()));
   g.registerFactory<SignInFormBloc>(() => SignInFormBloc(g<IAuthFacade>()));
-  g.registerFactory<AuthBloc>(() => AuthBloc(g<IAuthFacade>()));
+  g.registerFactory<AuthBloc>(() => AuthBloc(
+        g<IAuthFacade>(),
+        g<IUserRepository>(),
+        g<IClientRepository>(),
+      ));
+
+  //Register prod Dependencies --------
+  if (environment == 'prod') {
+    g.registerLazySingleton<IClientRepository>(
+        () => ClientRepository(g<Firestore>()));
+    g.registerLazySingleton<IUserRepository>(
+        () => UserRepository(g<Firestore>()));
+  }
 }
 
 class _$FirebaseInjectableModule extends FirebaseInjectableModule {}

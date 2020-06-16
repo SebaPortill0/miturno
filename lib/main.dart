@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:injectable/injectable.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   configureInjection(Environment.prod);
   runApp(AppWidget());
 }
