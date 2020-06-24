@@ -6,7 +6,7 @@ extension FirebaseUserDomainX on FirebaseUser {
   User toDomain() {
     return User(
       id: UniqueId.fromUniqueString(uid),
-      email: email 
+      email: email, 
     );
   }
 }

@@ -13,3 +13,10 @@ Container verticalSpaceSmall = Container(height: 15);
 Container verticalSpaceMedium = Container(height: 30);
 
 Container horizontalSpaceTiny = Container(width: 10);
+
+// Text styles
+TextStyle buttonTitleTextStyle = const TextStyle(
+  color: white,
+  fontWeight: FontWeight.bold,
+  // TODO: Continue generating this style
+);
